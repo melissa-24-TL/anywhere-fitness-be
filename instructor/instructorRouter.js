@@ -1,74 +1,58 @@
 const router = require("express").Router();
-const Class = require('./instructorModel');
-const validate = require("../auth/validate.js");
-const {checkInstructor} = require('./instructorMiddleware');
+const Instructor = require('./instructorModel.js');
+const db = require('../database/db-config.js');
 
+// Get Requests
 
-router.use(checkInstructor);
-router.use("/:id", validate.user);
-
-
-router.post('/', validate.loggedon, (req, res) => {
-  const data = req.body;
-
-  Class.addClass(data)
-    .then(classes => {
-      res.status(200).json({data: classes});
-    })
-    .catch(err => {
-      res.status(500).json({message: 'could not add', error: err.message});
-    });
+router.get("/", (req, res, next) => {
+  Instructor.getClass()
+      .then(clas => res.status(200).json(clas))
+      .catch(err => next({ code: 500, message: "Error retrieving classes", err }));
 });
 
-router.put('/:id', validate.loggedon, (req, res) => {
+// Post Request
+
+router.post('/', (req, res) => {
+  const classData = req.body;
+  db('class')
+    .insert(classData)
+    .then(id => res.status(201).json({data: id, message: "Class has been added"}))
+    .catch((err) => console.log(err));
+});
+
+// Put Request
+router.put('/:id', (req, res) => {
+  const {id} = req.params;
   const changes = req.body;
+  db('class')
+      .where('id', id)
+      .update(changes)
+      .then(count => {
+          if (count > 0) {
+              res.status(200).json({message: 'Record numbers changed', count });
+          } else {
+              res.status(404).json({message: 'that id does not exist'});
+          }
+      })
+      .catch((err) => console.log(err));
+});
+
+// Delete Request
+router.delete('/:id', (req, res) => {
   const {id} = req.params;
-
-  Class.updateClass(id, changes)
-    .then(clas => {
-      if (clas) {
-        res.status(200).json({clas});
-      } else {
-        res.status(404).json({error: 'please provide right information'});
-      }
-    })
-    .catch(err => {
-      res.status(500).json({message: 'There was an error updating', error: err.message});
-    });
+  db('class')
+      .where('id', id)
+      .delete()
+      .then(count => {
+          if (count > 0) {
+              res.status(200).json({message: 'Number of records deleted', count});
+          } else {
+              res.status(404).json({message: 'That is not a valid id'});
+          }
+      })
+      .catch((err) => console.log(err));
 });
 
-router.delete('/:id', validate.loggedon, (req, res) => {
-  const {id} = req.params;
 
-  Class.removeClass(id)
-    .then(clas => {
-      if (clas) {
-        res.status(200).json({data: clas, message: 'class deleted'});
-      } else {
-        res.status(404).json({error: 'please provide correct id'});
-      }
-    })
-    .catch(err => {
-      res.status(500).json({message: 'Error deleting class'});
-    });
-});
-
-router.get('/:id', (req, res) => {
-  const {id} = req.params;
-
-  Class.getClassById(id)
-    .then(clas => {
-      res.status(200).json({clas});
-    })
-    .catch(err => {
-      res.status(500).json({error: err.message});
-    });
-});
-
-router.get('/', (req, res, next) => {
-  Class.getClass()
-    .then(clas => res.status(200).json(clas))
-    .catch(err => next({code: 500, message: "Error getting your classes", err}));
-});
 
 module.exports = router;

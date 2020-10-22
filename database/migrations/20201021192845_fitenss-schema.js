@@ -18,17 +18,15 @@ exports.up = function(knex) {
       tbl.string('date').notNullable();
       tbl.integer('maxSize').notNullable();
       tbl.float('duration').notNullable();
-      tbl.bool('signedUp').defaultTo('false');
-      tbl.integer('currentMembers').defaultTo(0);
   })
   .createTable('instructor', tbl => {
       tbl.increments();
-      tbl.integer('user_id').unsigned().notNullable().references('id').inTable('users').onUpdate('CASCADE').onDelete('CASCADE');
+      tbl.integer('users_id').unsigned().notNullable().references('id').inTable('users').onUpdate('CASCADE').onDelete('CASCADE');
       tbl.integer('class_id').unsigned().notNullable().references('id').inTable('class').onUpdate('CASCADE').onDelete('CASCADE');
   })
-  .createTable('clientClasses', tbl => {
+  .createTable('classSignup', tbl => {
       tbl.increments();
-      tbl.integer('user_id').unsigned().notNullable().references('id').inTable('users').onUpdate('CASCADE').onDelete('CASCADE');
+      tbl.integer('users_id').unsigned().notNullable().references('id').inTable('users').onUpdate('CASCADE').onDelete('CASCADE');
       tbl.integer('class_id').unsigned().notNullable().references('id').inTable('class').onUpdate('CASCADE').onDelete('CASCADE');
   })
 };
