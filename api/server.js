@@ -7,7 +7,7 @@ const knexSessionStore = require('connect-session-knex')(session);
 // Import Router files
 const authRouter = require('../auth/authRouter');
 const userRouter = require('../users/userRouter');
-// const classRouter = require('');
+const classRouter = require('../client/clientRouter');
 const instructorRouter = require('../instructor/instructorRouter');
 const authenticate = require('../auth/authenticate');
 
@@ -43,8 +43,9 @@ server.use(session(sessionConfig));
 
 // Router endpoints
 server.use('/api/auth', authRouter);
-server.use('/api/users', authenticate, userRouter),
+server.use('/api/users', authenticate, userRouter);
 server.use('/api/instructor', instructorRouter);
+server.use('./api/classes', classRouter)
 
 server.use('/', (req, res) => {
     res.send(`
