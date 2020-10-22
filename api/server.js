@@ -46,6 +46,8 @@ server.use('/api/auth', authRouter);
 server.use('/api/users', authenticate, userRouter);
 server.use('/api/instructor', instructorRouter);
 server.use('./api/classes', classRouter)
+//Testing
+
 
 server.use('/', (req, res) => {
     res.send(`
