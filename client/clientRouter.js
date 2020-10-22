@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const Instructor = require('./instructorModel.js');
+const Instructor = require('../instructor/instructorModel');
 const db = require('../database/db-config.js');
 
 // Get Requests
